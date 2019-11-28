@@ -35,33 +35,65 @@
             <!-- Sidebar -->
             <ul class="navbar-nav ml-auto">
 
-                <li class="nav-item {% if title == 'Home'%}active{% endif %}">
+                <!-- <li class="nav-item {% if title == 'Home'%}active{% endif %}">
                     <a class="nav-link" href="/">
                         <i class="fas fa-home mr-2"></i>
                         Home
                         <span class="sr-only">(current)</span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="nav-item {% if title == 'Curah Hujan'%}active{% endif %}">
+                <!-- <li class="nav-item {% if title == 'Curah Hujan'%}active{% endif %}">
                     <a class="nav-link" href="/curahhujan">
                         <i class="fas fa-cloud-rain ml-2 mr-2"></i>
                         Content Normal
                     </a>
+                </li> -->
+
+                <li class="nav-item dropdown {% if title == 'Bendungan'%}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#"
+                      id="navbarBendunganDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-map ml-2 mr-2"></i>
+                        Bendungan
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarBendunganDropdown">
+                        <a class="dropdown-item" href="/bendungan/">Bendungan 1</a>
+                        <a class="dropdown-item" href="/bendungan/">Bendungan 2</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown {% if title == 'Embung'%}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#"
+                      id="navbarPetaDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-map ml-2 mr-2"></i>
+                        Embung
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarPetaDropdown">
+                        <a class="dropdown-item" href="/embung/">Embung 1</a>
+                        <a class="dropdown-item" href="/eembung/">Embung 2</a>
+                    </div>
                 </li>
 
                 <li class="nav-item dropdown {% if title == 'Map'%}active{% endif %}">
                     <a class="nav-link dropdown-toggle" href="#"
-                      id="navbarPetaDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      id="navbarMapDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-map ml-2 mr-2"></i>
-                        Content Dropdown
+                        Map
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarPetaDropdown">
-                        <a class="dropdown-item" href="/map/ch">Drop 1</a>
-                        <a class="dropdown-item" href="/map/tma">Drop 2</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarMapDropdown">
+                        <a class="dropdown-item" href="/embung/">Bendungan</a>
+                        <a class="dropdown-item" href="/eembung/">Embung</a>
                     </div>
                 </li>
-                {% if user() %}
+
+                <li class="nav-item {% if title == 'About'%}active{% endif %}">
+                    <a class="nav-link" href="/about">
+                        <i class="fas fa-cloud-rain ml-2 mr-2"></i>
+                        About
+                    </a>
+                </li>
+
+                <!-- {% if user() %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
                           role="button" data-toggle="dropdown" aria-haspopup="true"
@@ -83,7 +115,7 @@
                     </li>
                 {% else %}
         			<a class="nav-link" href="/login"><i class="fas fa-key ml-2 mr-2"></i> Login</a>
-                {% endif %}
+                {% endif %} -->
 
                 {# <!-- Nav Item - Logout -->
                 <li class="nav-item">

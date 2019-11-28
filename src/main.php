@@ -13,8 +13,14 @@ $app->get('/', function(Request $request, Response $response, $args) {
     ]);
 });
 
-// Auth User
+$app->get('/about', function(Request $request, Response $response, $args) {
 
+    return $this->view->render($response, 'main/about.html', [
+        'key' => "value",
+    ]);
+});
+
+// Auth User
 $app->get('/login', function(Request $request, Response $response, $args) {
     return $this->view->render($response, 'main/login.html');
 });

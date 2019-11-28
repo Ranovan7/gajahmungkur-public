@@ -1,0 +1,31 @@
+{% extends 'layouts/master.html' %}
+
+{% set title = "Bendungan" %}
+
+{% block content %}
+    <h1>Bendungan Index</h1>
+{% endblock %}
+
+{% block js %}
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script src="{{ asset('js/id.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-editable.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+          $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+          });
+    	     moment.locale('id');
+          $('.hari').each(function (i, e) {
+            console.log($(e).prepend(moment($(e).data('tgl')).fromNow()));
+          });
+          // $('#sejak').popover({
+          //       html: true,
+    		// 	placement: 'right',
+          //       title: "Sejak ? hari",
+          //       content: $('#sejakForm').html()
+          // });
+
+        });
+    </script>
+{% endblock %}
