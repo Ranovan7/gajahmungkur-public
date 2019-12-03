@@ -3,7 +3,60 @@
 {% set title = "Bendungan" %}
 
 {% block content %}
-    <h1>Bendungan Index</h1>
+    <div class="container">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th rowspan="3">No</th>
+                    <th rowspan="3">Nama Bendungan</th>
+                    <th rowspan="3">Kondisi</th>
+                    <th colspan="5">Data Teknis Bendungan</th>
+                    <th colspan="9">Tanggal</th>
+                </tr>
+                <tr>
+                    <th rowspan="2">Tampungan (Juta M3)</th>
+                    <th rowspan="2">Irigasi (Ha)</th>
+                    <th rowspan="2">Elevasi Puncak (M)</th>
+                    <th rowspan="2">Elevasi Puncak Mercu (M)</th>
+                    <th rowspan="2">Elevasi Air Minimum (M)</th>
+                    <th rowspan="2">07 (M)</th>
+                    <th rowspan="2">12 (M)</th>
+                    <th rowspan="2">18 (M)</th>
+                    <th rowspan="2">Vol (Juta M3)</th>
+                    <!-- <th rowspan="2">TMA Banjir (Juta M3)</th> -->
+                    <th colspan="2">Outflow (M3/det)</th>
+                    <th rowspan="2">VNotch (L/det3)</th>
+                    <th rowspan="2">Curah Hujan (mm)</th>
+                </tr>
+                <tr>
+                    <th>Intake</th>
+                    <th>Spillway</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in waduk %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ w.nama }}</td>
+                        <td> - </td>
+                        <td>{{ w.volume }}</td>
+                        <td>{{ w.lbi }}</td>
+                        <td>{{ w.elev_puncak }}</td>
+                        <td>{{ w.muka_air_max }}</td>
+                        <td>{{ w.muka_air_min }}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>{{ w.outflow_vol }}</td>
+                        <td>{{ w.outflow_deb }}</td>
+                        <td>{{ w.spillway_deb }}</td>
+                        <td>{{ w.debit }}</td>
+                        <td>{{ w.curahhujan }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 
 {% block js %}
