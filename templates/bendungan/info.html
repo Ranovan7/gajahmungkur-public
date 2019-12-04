@@ -3,7 +3,13 @@
 {% set title = "Bendungan" %}
 
 {% block content %}
-    <h1>Bendungan Info</h1>
+    <h1>{{ waduk.nama }} Info</h1>
+    <ul>
+        <li>Elevasi Puncak : {{ waduk.elev_puncak }}</li>
+        <li>Muka Air Normal : {{ waduk.muka_air_normal }}</li>
+        <li>TMA : {{ waduk.tma }}</li>
+        <li>Muka Air Minimal : {{ waduk.muka_air_min }}</li>
+    </ul>
 {% endblock %}
 
 {% block js %}
