@@ -1,0 +1,182 @@
+{% extends 'layouts/master.html' %}
+
+{% set title = "Bendungan" %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ waduk.nama }} RTOW</h1>
+        <div>
+            <canvas id="operasiChart" style="width: 100%; height: 300px; border: solid 1px #eee;" class="chartjs-render-monitor"></canvas>
+        </div>
+        <p>{{ waduk.nama }}</p>
+        <div>
+            <canvas id="outflowChart" style="width: 100%; height: 300px; border: solid 1px #eee;" class="chartjs-render-monitor"></canvas>
+        </div>
+        <p>{{ waduk.nama }}</p>
+        <div>
+            <canvas id="inflowChart" style="width: 100%; height: 300px; border: solid 1px #eee;" class="chartjs-render-monitor"></canvas>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script src="{{ asset('js/id.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-editable.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+        $(document).ready(function() {
+          $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+          });
+    	     moment.locale('id');
+          $('.hari').each(function (i, e) {
+            console.log($(e).prepend(moment($(e).data('tgl')).fromNow()));
+          });
+          // $('#sejak').popover({
+          //       html: true,
+    		// 	placement: 'right',
+          //       title: "Sejak ? hari",
+          //       content: $('#sejakForm').html()
+          // });
+
+
+        });
+
+        // chart
+        let options = {
+            responsive: true,
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                },
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: false
+                    }
+                }]
+            },
+            tooltips: {
+                position: "nearest",
+                mode: "index",
+                intersect: false,
+                callbacks: {
+                    label: (item, data) => `${data.datasets[item.datasetIndex].label} : ${item.yLabel} cm`,
+                },
+            },
+        };
+        let ctx = document.getElementById('operasiChart').getContext('2d');
+        let myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [{{ tanggal|raw }}],
+                datasets: [
+                    {
+                        label: "Batas Atas",
+                        data: [{{ operasi.po_bona|raw }}],
+                        backgroundColor: 'rgba(255,0,0,0.5)',
+                        borderColor: 'rgba(255,0,0,1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointStyle: 'triangle'
+                    },
+                    {
+                        label: "Batas Bawah",
+                        data: [{{ operasi.po_bonb|raw }}],
+                        backgroundColor: 'rgba(0,255,0,0.5)',
+                        borderColor: 'rgba(0,255,0,1)',
+                        borderWidth: 1,
+                        fill: false
+                    },
+                    {
+                        label: "Realisasi",
+                        data: [{{ operasi.real|raw }}],
+                        backgroundColor: 'rgba(0,0,255,0.5)',
+                        borderColor: 'rgba(0,0,255,1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointStyle: 'rectRot'
+                    },
+                    {
+                        label: "Elevasi Minimal",
+                        data: [{{ operasi.elev_min|raw }}],
+                        backgroundColor: 'rgba(255,0,255,0.5)',
+                        borderColor: 'rgba(255,0,255,1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointStyle: 'cross'
+                    },
+                    {
+                        label: "Sedimen",
+                        data: [{{ operasi.sedimen|raw }}],
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        borderColor: 'rgba(0,0,0,1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointStyle: 'line'
+                    }
+                ]
+            },
+            options: options
+        });
+
+        let ctx_out = document.getElementById('outflowChart').getContext('2d');
+        let outChart = new Chart(ctx_out, {
+            type: 'line',
+            data: {
+                labels: [{{ tanggal|raw }}],
+                datasets: [
+                    {
+                        label: "Outflow Rencana",
+                        data: [{{ operasi.po_outflow|raw }}],
+                        backgroundColor: 'rgba(0,0,255,0.5)',
+                        borderColor: 'rgba(0,0,255,1)',
+                        borderWidth: 1,
+                        fill: false
+                    },
+                    {
+                        label: "Outflow Realisasi",
+                        data: [{{ operasi.real_outflow|raw }}],
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        borderColor: 'rgba(0,0,0,1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointStyle: 'rectRot'
+                    }
+                ]
+            },
+            options: options
+        });
+
+        let ctx_in = document.getElementById('inflowChart').getContext('2d');
+        let inChart = new Chart(ctx_in, {
+            type: 'line',
+            data: {
+                labels: [{{ tanggal|raw }}],
+                datasets: [
+                    {
+                        label: "Inflow Rencana",
+                        data: [{{ operasi.po_inflow|raw }}],
+                        backgroundColor: 'rgba(0,0,255,0.5)',
+                        borderColor: 'rgba(0,0,255,1)',
+                        borderWidth: 1,
+                        fill: false
+                    },
+                    {
+                        label: "Inflow Realisasi",
+                        data: [{{ operasi.real_inflow|raw }}],
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        borderColor: 'rgba(0,0,0,1)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointStyle: 'rectRot'
+                    }
+                ]
+            },
+            options: options
+        });
+    </script>
+{% endblock %}

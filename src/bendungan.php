@@ -76,7 +76,59 @@ $app->group('/bendungan', function() {
             return $this->view->render($response, 'bendungan/info.html', [
                  'waduk' => $waduk
             ]);
-        })->setName('bendungan.info');
+        })->setName('bendungan.tma');
+
+        $this->get('/operasi', function(Request $request, Response $response, $args) {
+            $id = $request->getAttribute('id');
+            $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
+            $rtow = $this->db->query("SELECT * FROM rencana WHERE waduk_id={$id}")->fetchAll();
+
+            $tanggal = "";
+            $operasi = [
+                'po_bona' => "",
+                'po_bonb' => "",
+                'real' => "",
+                'elev_min' => "",
+                'sedimen' => "",
+                'po_outflow' => "",
+                'po_inflow' => "",
+                'real_outflow' => "",
+                'real_inflow' => ""
+            ];
+            foreach ($rtow as $i => $rt) {
+                if ($i != 0) {
+                    $tanggal .= ",";
+                    $operasi['po_bona'] .= ",";
+                    $operasi['po_bonb'] .= ",";
+                    $operasi['real'] .= ",";
+                    $operasi['elev_min'] .= ",";
+                    $operasi['sedimen'] .= ",";
+                    $operasi['po_outflow'] .= ",";
+                    $operasi['po_inflow'] .= ",";
+                    $operasi['real_outflow'] .= ",";
+                    $operasi['real_inflow'] .= ",";
+                }
+
+                $tgl_str = explode(" ", $rt['waktu'])[0];
+                $tanggal .= "'{$tgl_str}'";
+                $operasi['po_bona'] .= "{$rt['po_bona']}";
+                $operasi['po_bonb'] .= "{$rt['po_bonb']}";
+                $operasi['real'] .= (string) $rt['po_bona'] -2;
+                $operasi['elev_min'] .= "{$waduk['muka_air_min']}";
+                $operasi['sedimen'] .= "{$waduk['sedimen']}";
+                $operasi['po_outflow'] .= (string) (!$waduk['po_outflow_deb']) ? '0' : $waduk['po_outflow_deb'];
+                $operasi['po_inflow'] .= (string) (!$waduk['po_inflow_deb']) ? '0' : $waduk['po_inflow_deb'];
+                $operasi['real_outflow'] .= "0";
+                $operasi['real_inflow'] .= "0";
+            }
+            // dump($operasi);
+
+            return $this->view->render($response, 'bendungan/operasi.html', [
+                 'waduk' => $waduk,
+                 'operasi' => $operasi,
+                 'tanggal' => $tanggal
+            ]);
+        })->setName('bendungan.operasi');
     });
 
 });
