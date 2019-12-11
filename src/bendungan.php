@@ -129,6 +129,85 @@ $app->group('/bendungan', function() {
                  'tanggal' => $tanggal
             ]);
         })->setName('bendungan.operasi');
+
+        $this->get('/vnotch', function(Request $request, Response $response, $args) {
+            $id = $request->getAttribute('id');
+            $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
+            $periodik_vnotch = $this->db->query("SELECT periodik_keamanan.*,
+                                                periodik_daily.curahhujan as ch,
+                                                vnotch.nama as vn_name
+                                        FROM periodik_keamanan
+                                        LEFT JOIN periodik_daily ON periodik_daily.id = (
+                                            SELECT id from periodik_daily
+                                                WHERE periodik_daily.sampling = periodik_keamanan.sampling
+                                                    AND periodik_daily.waduk_id = periodik_keamanan.waduk_id
+                                                LIMIT 1
+                                        )
+                                        LEFT JOIN vnotch ON vnotch.id = (
+                                            SELECT id from vnotch
+                                                WHERE vnotch.waduk_id = periodik_keamanan.waduk_id
+                                                LIMIT 1
+                                        )
+                                        WHERE periodik_keamanan.waduk_id={$id}
+                                            AND periodik_keamanan.debit > 0
+                                        ORDER BY periodik_keamanan.sampling DESC
+                                        LIMIT 24");
+
+            $filtered_vnotch = [];
+            foreach ($periodik_vnotch as $i => $vn) {
+                $tgl_str = explode(" ", $vn['sampling'])[0];
+                if (!array_key_exists($tgl_str, $filtered_vnotch)){
+                    $filtered_vnotch[$tgl_str] = [
+                        'ch' => 0,
+                        'vn' => []
+                    ];
+                }
+                if (!array_key_exists($vn['vn_name'], $filtered_vnotch[$tgl_str]['vn'])){
+                    $filtered_vnotch[$tgl_str]['vn'][$vn['vn_name']] = 0;
+                }
+                $filtered_vnotch[$tgl_str]['ch'] += $vn['ch'];
+                $filtered_vnotch[$tgl_str]['vn'][$vn['vn_name']] += $vn['debit'];
+            }
+
+            $vnotch = [
+                'tanggal' => "",
+                'ch' => ""
+            ];
+            $ins = 0;
+            foreach ($filtered_vnotch as $i => $vn) {
+                if ($ins != 0) {
+                    $vnotch['tanggal'] .= ",";
+                    $vnotch['ch'] .= ",";
+                    foreach ($vn['vn'] as $vnn => $vnn_val) {
+                        $vnotch['vn'][$vnn] .= ",";
+                    }
+                }
+
+                $vnotch['tanggal'] .= "'{$i}'";
+                $vnotch['ch'] .= "{$vn['ch']}";
+                foreach ($vn['vn'] as $vnn => $vnn_val) {
+                    if (!array_key_exists($vnn, $vnotch['vn'])){
+                        $vnotch['vn'][$vnn] = "";
+                    }
+                    $vnotch['vn'][$vnn] .= $vn['vn'][$vnn];
+                }
+                $ins += 1;
+            }
+            // dump($vnotch);
+            return $this->view->render($response, 'bendungan/vnotch.html', [
+                 'waduk' => $waduk,
+                 'vnotch' => $vnotch
+            ]);
+        })->setName('bendungan.vnotch');
+
+        $this->get('/piezometer', function(Request $request, Response $response, $args) {
+            $id = $request->getAttribute('id');
+            $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
+
+            return $this->view->render($response, 'bendungan/piezo.html', [
+                 'waduk' => $waduk
+            ]);
+        })->setName('bendungan.piezo');
     });
 
 });

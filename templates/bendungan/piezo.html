@@ -1,0 +1,44 @@
+{% extends 'layouts/master.html' %}
+
+{% set title = "Bendungan" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>{{ waduk.nama }} Piezometer</h1>
+        </div>
+        <div class="col-md-6">
+            <div class="btn-group" role="group" style="float: right">
+                <a class="btn btn-primary" href="{{ path_for('bendungan.tma', {'id': waduk.id}) }}">TMA</a>
+                <a class="btn btn-primary" href="{{ path_for('bendungan.operasi', {'id': waduk.id}) }}">RTOW</a>
+                <a class="btn btn-primary" href="{{ path_for('bendungan.vnotch', {'id': waduk.id}) }}">VNotch</a>
+                <a class="btn btn-primary disabled" href="{{ path_for('bendungan.piezo', {'id': waduk.id}) }}">Piezometer</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script src="{{ asset('js/id.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-editable.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+          $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+          });
+    	     moment.locale('id');
+          $('.hari').each(function (i, e) {
+            console.log($(e).prepend(moment($(e).data('tgl')).fromNow()));
+          });
+          // $('#sejak').popover({
+          //       html: true,
+    		// 	placement: 'right',
+          //       title: "Sejak ? hari",
+          //       content: $('#sejakForm').html()
+          // });
+        });
+    </script>
+{% endblock %}

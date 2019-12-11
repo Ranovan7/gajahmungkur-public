@@ -3,36 +3,52 @@
 {% set title = "Bendungan" %}
 
 {% block content %}
-    <h1>{{ waduk.nama }} Info</h1>
-    <div  style="width: 100%; height: 350px; margin-bottom: 200px;">
-	<svg height="380px" width="1000px">
-		<g>
-            <text id="nmab" x="35" y="14" fill="red" font-family="monospace">Elevasi Puncak: </text>
-			<text id="ntma" x="35" y="60" fill="blue" font-family="monospace">TMA: </text>
-			<text id="nman" x="35" y="48" fill="orange" font-family="monospace">MAN: </text>
-			<text id="nmamin" x="35" y="237" fill="gray" font-family="monospace">MaMin: </text>
-			<defs>
-				<linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
-					<stop offset="0%" style="stop-color:lightblue;stop-opacity:1" />
-					<stop offset="100%" style="stop-color:rgba(196,196,255,0.5);stop-opacity:1" />
-				</linearGradient>
-			</defs>
-			<path id="air_id" d="M180 271, L180 35 520 35 520 271 Z" stroke="black" stroke-width="0" fill="url(#grad2)" />
-			<line id="etma" x1="180" x2="520" style="stroke:blue;stroke-width:2" />
-            <line id="emab" x1="180" x2="1020" style="stroke:red;stroke-width:1" />
-			<line id="emamin" x1="180" x2="520" y1="250" y2="250" style="stroke:gray;stroke-width:1" />
-			<line x1="880" y1="330" x2="960" y2="330" style="stroke:blue;stroke-width:1" />
-			<!--<path d="M180 272, L240 272, C600 -44, 460 -44, 820 272, L920 370, 1020 272" stroke="#888888" stroke-width="5" fill="transparent" />-->
-			<!--<path d="M180 274, L242 274, C600 -41 460 -41, 818 274, L919 373 180 373 Z" stroke="black" stroke-width="0" fill="tan" />-->
-            <path d="M180 274, L242 274, C600 -24 460 -24, 818 274, L919 373 180 373 Z" stroke="black" stroke-width="0" fill="tan" />
-			<line id="eman" x1="180" x2="520" y1="34" y2="34"style="stroke:orange;stroke-width:1" />
-			<path d="M180 272, L240 272, C600 -24, 460 -24, 820 272, L920 370, 1020 272" stroke="#888888" stroke-width="5" fill="transparent" />
-			<path d="M921 373, L1000 373 1000 295 Z" stroke="#888888" stroke-width="1" fill="tan" />
-			<path d="M884 332, L920 366 955 332" stroke="black" stroke-width="0" fill="lightblue" />
-
-		</g>
-	</svg>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>{{ waduk.nama }}</h1>
+        </div>
+        <div class="col-md-6">
+            <div class="btn-group" role="group" style="float: right">
+                <a class="btn btn-primary disabled" href="{{ path_for('bendungan.tma', {'id': waduk.id}) }}">TMA</a>
+                <a class="btn btn-primary" href="{{ path_for('bendungan.operasi', {'id': waduk.id}) }}">RTOW</a>
+                <a class="btn btn-primary" href="{{ path_for('bendungan.vnotch', {'id': waduk.id}) }}">VNotch</a>
+                <a class="btn btn-primary" href="{{ path_for('bendungan.piezo', {'id': waduk.id}) }}">Piezometer</a>
+            </div>
+        </div>
     </div>
+
+    <div class="container" style="width: 100%; height: 350px; margin-bottom: 200px;">
+        <h4>Status TMA</h4>
+        <svg height="380px" width="1000px">
+    		<g>
+                <text id="nmab" x="35" y="14" fill="red" font-family="monospace">Elevasi Puncak: </text>
+    			<text id="ntma" x="35" y="60" fill="blue" font-family="monospace">TMA: </text>
+    			<text id="nman" x="35" y="48" fill="orange" font-family="monospace">MAN: </text>
+    			<text id="nmamin" x="35" y="237" fill="gray" font-family="monospace">MaMin: </text>
+    			<defs>
+    				<linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+    					<stop offset="0%" style="stop-color:lightblue;stop-opacity:1" />
+    					<stop offset="100%" style="stop-color:rgba(196,196,255,0.5);stop-opacity:1" />
+    				</linearGradient>
+    			</defs>
+    			<path id="air_id" d="M180 271, L180 35 520 35 520 271 Z" stroke="black" stroke-width="0" fill="url(#grad2)" />
+    			<line id="etma" x1="180" x2="520" style="stroke:blue;stroke-width:2" />
+                <line id="emab" x1="180" x2="1020" style="stroke:red;stroke-width:1" />
+    			<line id="emamin" x1="180" x2="520" y1="250" y2="250" style="stroke:gray;stroke-width:1" />
+    			<line x1="880" y1="330" x2="960" y2="330" style="stroke:blue;stroke-width:1" />
+    			<!--<path d="M180 272, L240 272, C600 -44, 460 -44, 820 272, L920 370, 1020 272" stroke="#888888" stroke-width="5" fill="transparent" />-->
+    			<!--<path d="M180 274, L242 274, C600 -41 460 -41, 818 274, L919 373 180 373 Z" stroke="black" stroke-width="0" fill="tan" />-->
+                <path d="M180 274, L242 274, C600 -24 460 -24, 818 274, L919 373 180 373 Z" stroke="black" stroke-width="0" fill="tan" />
+    			<line id="eman" x1="180" x2="520" y1="34" y2="34"style="stroke:orange;stroke-width:1" />
+    			<path d="M180 272, L240 272, C600 -24, 460 -24, 820 272, L920 370, 1020 272" stroke="#888888" stroke-width="5" fill="transparent" />
+    			<path d="M921 373, L1000 373 1000 295 Z" stroke="#888888" stroke-width="1" fill="tan" />
+    			<path d="M884 332, L920 366 955 332" stroke="black" stroke-width="0" fill="lightblue" />
+
+    		</g>
+    	</svg>
+    </div>
+</div>
 {% endblock %}
 
 {% block js %}
