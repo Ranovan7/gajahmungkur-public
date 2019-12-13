@@ -203,9 +203,73 @@ $app->group('/bendungan', function() {
         $this->get('/piezometer', function(Request $request, Response $response, $args) {
             $id = $request->getAttribute('id');
             $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
+            $piezometer = $this->db->query("SELECT * FROM piezometer WHERE waduk_id={$id}")->fetchAll();
+            $piezo_perio = $this->db->query("SELECT periodik_keamanan.*,
+                                                    piezometer.nama as nama_piezo
+                                                FROM periodik_keamanan
+                                                LEFT JOIN piezometer ON piezometer.id = periodik_keamanan.keamanan_id
+                                                WHERE periodik_keamanan.waduk_id={$id}
+                                                ORDER BY periodik_keamanan.sampling")->fetchAll();
+
+            $tgl_perio = [];
+            $piezodata = [];
+
+            foreach ($piezometer as $p) {
+                $code = explode(" ", $p['nama'])[1];
+                $profile = str_split($code)[0];
+                $alpha = str_split($code)[1];
+                if (!array_key_exists($profile, $piezodata)) {
+                    $piezodata[$profile] = [];
+                }
+                $piezodata[$profile][$alpha] = [
+                    'bts_pori' => $p['bts_tekanan_pori'],
+                    'tgls' => "",
+                    'bts_pori_ds' => "",
+                    'piezo_ds' => ""
+                ];
+            }
+
+            foreach ($piezo_perio as $p) {
+                $tgl_str = explode(" ", $p['sampling'])[0];
+                $date = date_create($tgl_str);
+                $tgl = date_format($date, "j M Y");
+                if (!array_key_exists($tgl, $tgl_labels)) {
+                    $tgl_perio[$tgl] = [];
+                    $code = explode(" ", $p['nama_piezo'])[1];
+                    if (!empty($code)) {
+                        $tgl_perio[$tgl][$code] = $p['tma'];
+                    }
+                }
+            }
+
+            $tgl_labels = "";
+            $count = 0;
+            foreach ($tgl_perio as $tgl => $pie) {
+                if ($count > 0) {
+                    $tgl_labels .= ",";
+                }
+                $tgl_labels .= "'{$tgl}'";
+                foreach ($pie as $c => $p) {
+                    $profile = str_split($c)[0];
+                    $alpha = str_split($c)[1];
+
+                    if (!empty($piezodata[$profile][$alpha]['tgls'])) {
+                        $piezodata[$profile][$alpha]['piezo_ds'] .= ",";
+                        $piezodata[$profile][$alpha]['bts_pori_ds'] .= ",";
+                        $piezodata[$profile][$alpha]['tgls'] .= ",";
+                    }
+                    $piezodata[$profile][$alpha]['piezo_ds'] .= $p;
+                    $piezodata[$profile][$alpha]['bts_pori_ds'] .= $piezodata[$profile][$alpha]['bts_pori'];
+                    $piezodata[$profile][$alpha]['tgls'] .= "'{$tgl}'";
+                }
+                $count += 1;
+            }
+            // dump($piezodata);
 
             return $this->view->render($response, 'bendungan/piezo.html', [
-                 'waduk' => $waduk
+                 'waduk' => $waduk,
+                 'tgl_labels' => $tgl_labels,
+                 'piezodata' => $piezodata
             ]);
         })->setName('bendungan.piezo');
     });

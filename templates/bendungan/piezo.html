@@ -17,6 +17,40 @@
             </div>
         </div>
     </div>
+    <br>
+    <!-- {% for k in piezodata %}
+        {% if loop.index0 % 3 == 0 %}
+            <div class="container">
+                <div class="row">
+        {% endif %}
+
+        {% set num = loop.index0 % 3 + 1 %}
+        {% set ind = loop.index0 % 3 %}
+        {% set code = codeset[ind] %}
+        <div class="col-sm-4">
+            <p>{{ num }}{{ code }}</p>
+            <canvas id="curahHujanChart" style="width: 100%; height: 300px; border: solid 1px #eee;" class="chartjs-render-monitor"></canvas>
+        </div>
+        {% if ((loop.index0 + 1) % 3 == 0) or (loop.last) %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %} -->
+    {% for i, piezo in piezodata %}
+        <div class="container">
+            <div class="row">
+            {% for c, p in piezo %}
+                <div class="col-sm-4">
+                    <canvas id="piezo{{ i }}{{ c }}Chart" style="width: 100%; height: 200px; border: solid 1px #eee;" class="chartjs-render-monitor"></canvas>
+                    <div class="text-center">
+                        <p>Piezometer {{ i }}{{ c }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
 </div>
 {% endblock %}
 
@@ -24,6 +58,7 @@
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/id.js') }}"></script>
     <script src="{{ asset('js/bootstrap-editable.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script>
         $(document).ready(function() {
           $(function () {
@@ -39,6 +74,64 @@
           //       title: "Sejak ? hari",
           //       content: $('#sejakForm').html()
           // });
+
+          let options = {
+              responsive: true,
+              legend: {
+                  labels: {
+                      usePointStyle: true,
+                  },
+              },
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero: false
+                      }
+                  }]
+              },
+              tooltips: {
+                  position: "nearest",
+                  mode: "index",
+                  intersect: false,
+                  callbacks: {
+                      label: (item, data) => `${data.datasets[item.datasetIndex].label} : ${item.yLabel} cm`,
+                  },
+              },
+          };
+
+          // generating all piezo chart
+          {% for i, piezo in piezodata %}
+              {% for c, p in piezo %}
+                  let ctx{{ i }}{{ c }} = document.getElementById('piezo{{ i }}{{ c }}Chart').getContext('2d');
+                  let piezo{{ i }}{{ c }}Chart = new Chart(ctx{{ i }}{{ c }}, {
+                      type: 'line',
+                      data: {
+                          labels: [{{ p.tgls|raw }}],
+                          datasets: [
+                              {
+                                  label: "Piezometer {{ i }}{{ c }}",
+                                  data: [{{ p.piezo_ds|raw }}],
+                                  backgroundColor: 'rgba(0,0,255,0.5)',
+                                  borderColor: 'rgba(0,0,255,1)',
+                                  borderWidth: 1,
+                                  fill: false,
+                                  pointStyle: 'round'
+                              },
+                              {
+                                  label: "Batas Pori {{ i }}{{ c }}",
+                                  data: [{{ p.bts_pori_ds|raw }}],
+                                  backgroundColor: 'rgba(0,0,0,0.5)',
+                                  borderColor: 'rgba(0,0,0,1)',
+                                  borderWidth: 1,
+                                  fill: false,
+                                  pointStyle: 'cross'
+                              }
+                          ]
+                      },
+                      options: options
+                  });
+              {% endfor %}
+          {% endfor %}
         });
     </script>
 {% endblock %}
