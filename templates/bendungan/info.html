@@ -2,6 +2,10 @@
 
 {% set title = "Bendungan" %}
 
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <div class="row">
@@ -17,7 +21,10 @@
             </div>
         </div>
     </div>
-
+    <div class="text-center">
+        <h5><span id="datepicker">{{ sampling }}</span></h5>
+    </div>
+    <br>
     <div class="container" style="width: 100%; height: 350px; margin-bottom: 200px;">
         <h4>Status TMA</h4>
         <svg height="380px" width="1000px">
@@ -55,6 +62,7 @@
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/id.js') }}"></script>
     <script src="{{ asset('js/bootstrap-editable.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script>
         $(document).ready(function() {
           $(function () {
@@ -72,6 +80,15 @@
           // });
 
 
+        });
+
+        $('#datepicker').datepicker({
+            todayHighlight: true,
+            autoclose: true,
+            format: "yyyy-mm-dd"
+        });
+        $('#datepicker').on('changeDate', function () {
+            window.location = "{{ path_for('bendungan.tma', {'id': waduk.id}) }}?sampling=" + $('#datepicker').datepicker('getFormattedDate')
         });
 
         let drawDam = function (nTma, nMab, nMan, nMamin) {
@@ -110,6 +127,6 @@
             let nmamin = document.getElementById('nmamin');
             nmamin.innerHTML = 'MaMin: +' + nMamin + 'm';
         };
-        drawDam({{ waduk.tma }}, {{ waduk.elev_puncak }}, {{ waduk.muka_air_normal }}, {{ waduk.muka_air_min }});
+        drawDam({% if waduk.tma is empty %}0{% else %}{{ waduk.tma }}{% endif %}, {{ waduk.elev_puncak }}, {{ waduk.muka_air_normal }}, {{ waduk.muka_air_min }});
     </script>
 {% endblock %}

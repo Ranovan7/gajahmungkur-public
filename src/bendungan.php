@@ -62,26 +62,36 @@ $app->group('/bendungan', function() {
 
         $this->get('[/]', function(Request $request, Response $response, $args) {
             $id = $request->getAttribute('id');
+            $sampling = $request->getParam('sampling', date('Y-m-d'));
+
             $waduk = $this->db->query("SELECT waduk.*,
                                             tma.manual as tma
                                         FROM waduk
                                         LEFT JOIN tma ON tma.id = (
                                             SELECT id from tma
                                                 WHERE waduk_id = waduk.id
+                                                    AND sampling='{$sampling} 06:00:00'
                                                 ORDER BY sampling DESC
                                                 LIMIT 1
                                         )
                                         WHERE waduk.id={$id}")->fetch();
-
+            // dump($waduk);
             return $this->view->render($response, 'bendungan/info.html', [
-                 'waduk' => $waduk
+                 'waduk' => $waduk,
+                 'sampling' => $sampling
             ]);
         })->setName('bendungan.tma');
 
         $this->get('/operasi', function(Request $request, Response $response, $args) {
             $id = $request->getAttribute('id');
+            $sampling = $request->getParam('sampling', date('Y'));
+            $end = date('Y-m-d', strtotime("{$sampling}-11-1"));
+            $start = date('Y-m-d', strtotime($end .' -1year'));
+
             $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
-            $rtow = $this->db->query("SELECT * FROM rencana WHERE waduk_id={$id}")->fetchAll();
+            $rtow = $this->db->query("SELECT * FROM rencana
+                                        WHERE waduk_id={$id}
+                                            AND waktu BETWEEN '{$start}' AND '{$end}'")->fetchAll();
 
             $tanggal = "";
             $operasi = [
@@ -126,12 +136,17 @@ $app->group('/bendungan', function() {
             return $this->view->render($response, 'bendungan/operasi.html', [
                  'waduk' => $waduk,
                  'operasi' => $operasi,
-                 'tanggal' => $tanggal
+                 'tanggal' => $tanggal,
+                 'sampling' => $sampling
             ]);
         })->setName('bendungan.operasi');
 
         $this->get('/vnotch', function(Request $request, Response $response, $args) {
             $id = $request->getAttribute('id');
+            $sampling = $request->getParam('sampling', date('Y'));
+            $end = date('Y-m-d', strtotime("{$sampling}-11-1"));
+            $start = date('Y-m-d', strtotime($end .' -1year'));
+
             $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
             $periodik_vnotch = $this->db->query("SELECT periodik_keamanan.*,
                                                 periodik_daily.curahhujan as ch,
@@ -149,8 +164,10 @@ $app->group('/bendungan', function() {
                                                 LIMIT 1
                                         )
                                         WHERE periodik_keamanan.waduk_id={$id}
+                                            AND periodik_keamanan.keamanan_type='vnotch'
                                             AND periodik_keamanan.debit > 0
-                                        ORDER BY periodik_keamanan.sampling DESC
+                                            AND periodik_keamanan.sampling BETWEEN '{$start}' AND '{$end}'
+                                        ORDER BY periodik_keamanan.sampling
                                         LIMIT 24");
 
             $filtered_vnotch = [];
@@ -183,7 +200,8 @@ $app->group('/bendungan', function() {
                     }
                 }
 
-                $vnotch['tanggal'] .= "'{$i}'";
+                $tgl = date_format(date_create($i), "j M Y");
+                $vnotch['tanggal'] .= "'{$tgl}'";
                 $vnotch['ch'] .= "{$vn['ch']}";
                 foreach ($vn['vn'] as $vnn => $vnn_val) {
                     if (!array_key_exists($vnn, $vnotch['vn'])){
@@ -196,12 +214,17 @@ $app->group('/bendungan', function() {
             // dump($vnotch);
             return $this->view->render($response, 'bendungan/vnotch.html', [
                  'waduk' => $waduk,
-                 'vnotch' => $vnotch
+                 'vnotch' => $vnotch,
+                 'sampling' => $sampling
             ]);
         })->setName('bendungan.vnotch');
 
         $this->get('/piezometer', function(Request $request, Response $response, $args) {
             $id = $request->getAttribute('id');
+            $sampling = $request->getParam('sampling', date('Y'));
+            $end = date('Y-m-d', strtotime("{$sampling}-11-1"));
+            $start = date('Y-m-d', strtotime($end .' -1year'));
+
             $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
             $piezometer = $this->db->query("SELECT * FROM piezometer WHERE waduk_id={$id}")->fetchAll();
             $piezo_perio = $this->db->query("SELECT periodik_keamanan.*,
@@ -209,6 +232,8 @@ $app->group('/bendungan', function() {
                                                 FROM periodik_keamanan
                                                 LEFT JOIN piezometer ON piezometer.id = periodik_keamanan.keamanan_id
                                                 WHERE periodik_keamanan.waduk_id={$id}
+                                                    AND periodik_keamanan.keamanan_type='piezometer'
+                                                    AND sampling BETWEEN '{$start}' AND '{$end}'
                                                 ORDER BY periodik_keamanan.sampling")->fetchAll();
 
             $tgl_perio = [];
@@ -269,7 +294,8 @@ $app->group('/bendungan', function() {
             return $this->view->render($response, 'bendungan/piezo.html', [
                  'waduk' => $waduk,
                  'tgl_labels' => $tgl_labels,
-                 'piezodata' => $piezodata
+                 'piezodata' => $piezodata,
+                 'sampling' => $sampling
             ]);
         })->setName('bendungan.piezo');
     });

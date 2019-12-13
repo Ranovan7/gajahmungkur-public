@@ -2,6 +2,10 @@
 
 {% set title = "Bendungan" %}
 
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <div class="row">
@@ -17,6 +21,10 @@
             </div>
         </div>
     </div>
+    <div class="text-center">
+        <h5>Periode : <span id="datepicker">{{ sampling }}</span> (Nov {{ sampling - 1 }} - Okt {{ sampling }})</h5>
+    </div>
+    <br>
     <div>
         <canvas id="curahHujanChart" style="width: 100%; height: 300px; border: solid 1px #eee;" class="chartjs-render-monitor"></canvas>
     </div>
@@ -31,6 +39,7 @@
     <script src="{{ asset('js/id.js') }}"></script>
     <script src="{{ asset('js/bootstrap-editable.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
     <script>
         $(document).ready(function() {
           $(function () {
@@ -47,6 +56,18 @@
           //       content: $('#sejakForm').html()
           // });
         });
+
+        $('#datepicker').datepicker({
+            todayHighlight: true,
+            autoclose: true,
+            format: "yyyy",
+            viewMode: "years",
+            minViewMode: "years"
+        });
+        $('#datepicker').on('changeDate', function () {
+            window.location = "{{ path_for('bendungan.vnotch', {'id': waduk.id}) }}?sampling=" + $('#datepicker').datepicker('getFormattedDate')
+        });
+
         let options = {
             responsive: true,
             legend: {
