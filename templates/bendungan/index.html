@@ -7,26 +7,26 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th rowspan="3">No</th>
-                    <th rowspan="3">Nama Bendungan</th>
-                    <th rowspan="3">Kondisi</th>
-                    <th colspan="5">Data Teknis Bendungan</th>
-                    <th colspan="9">Tanggal</th>
+                    <th rowspan="3" class="text-center align-middle">No</th>
+                    <th rowspan="3" class="text-center align-middle">Nama Bendungan</th>
+                    <th rowspan="3" class="text-center align-middle">Kondisi</th>
+                    <th colspan="5" class="text-center align-middle">Data Teknis Bendungan</th>
+                    <th colspan="9" class="text-center align-middle">Tanggal</th>
                 </tr>
                 <tr>
-                    <th rowspan="2">Tampungan (Juta M3)</th>
-                    <th rowspan="2">Irigasi (Ha)</th>
-                    <th rowspan="2">Elevasi Puncak (M)</th>
-                    <th rowspan="2">Elevasi Puncak Mercu (M)</th>
-                    <th rowspan="2">Elevasi Air Minimum (M)</th>
-                    <th rowspan="2">07 (M)</th>
-                    <th rowspan="2">12 (M)</th>
-                    <th rowspan="2">18 (M)</th>
-                    <th rowspan="2">Vol (Juta M3)</th>
+                    <th rowspan="2" class="text-center align-middle">Tampungan (Juta M3)</th>
+                    <th rowspan="2" class="text-center align-middle">Irigasi (Ha)</th>
+                    <th rowspan="2" class="text-center align-middle">Elevasi Puncak (M)</th>
+                    <th rowspan="2" class="text-center align-middle">Elevasi Puncak Mercu (M)</th>
+                    <th rowspan="2" class="text-center align-middle">Elevasi Air Minimum (M)</th>
+                    <th rowspan="2" class="text-center align-middle">07 (M)</th>
+                    <th rowspan="2" class="text-center align-middle">12 (M)</th>
+                    <th rowspan="2" class="text-center align-middle">18 (M)</th>
+                    <th rowspan="2" class="text-center align-middle">Vol (Juta M3)</th>
                     <!-- <th rowspan="2">TMA Banjir (Juta M3)</th> -->
-                    <th colspan="2">Outflow (M3/det)</th>
-                    <th rowspan="2">VNotch (L/det3)</th>
-                    <th rowspan="2">Curah Hujan (mm)</th>
+                    <th colspan="2" class="text-center align-middle">Outflow (M3/det)</th>
+                    <th rowspan="2" class="text-center align-middle">VNotch (L/det3)</th>
+                    <th rowspan="2" class="text-center align-middle">Curah Hujan (mm)</th>
                 </tr>
                 <tr>
                     <th>Intake</th>
@@ -39,19 +39,19 @@
                         <td>{{ loop.index }}</td>
                         <td><a href="{{ path_for('bendungan.tma', {'id': w.id}) }}">{{ w.nama }}</a></td>
                         <td> - </td>
-                        <td>{{ w.volume }}</td>
-                        <td>{{ w.lbi }}</td>
-                        <td>{{ w.elev_puncak }}</td>
-                        <td>{{ w.muka_air_max }}</td>
-                        <td>{{ w.muka_air_min }}</td>
-                        <td>{{ w.tma6 }}</td>
-                        <td>{{ w.tma12 }}</td>
-                        <td>{{ w.tma18 }}</td>
-                        <td>{{ w.outflow_vol }}</td>
-                        <td>{{ w.outflow_deb }}</td>
-                        <td>{{ w.spillway_deb }}</td>
-                        <td>{{ w.debit }}</td>
-                        <td>{{ w.curahhujan }}</td>
+                        <td class="text-right">{{ w.volume|number_format(0, ',', '.') }}</td>
+                        <td class="text-right">{{ w.lbi|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.elev_puncak|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.muka_air_max|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.muka_air_min|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.tma6|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.tma12|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.tma18|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.outflow_vol|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.outflow_deb|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.spillway_deb|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.debit|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{{ w.curahhujan|number_format(2, ',', '.') }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
