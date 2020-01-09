@@ -2,6 +2,15 @@
 
 {% set title = "Bendungan" %}
 
+{% block css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+<style>
+    .datepicker {
+        z-index: 10000 !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <div class="container">
         <table class="table table-bordered">
@@ -11,7 +20,9 @@
                     <th rowspan="3" class="text-center align-middle">Nama Bendungan</th>
                     <th rowspan="3" class="text-center align-middle">Kondisi</th>
                     <th colspan="5" class="text-center align-middle">Data Teknis Bendungan</th>
-                    <th colspan="9" class="text-center align-middle">Tanggal</th>
+                    <th colspan="9" class="text-center align-middle">
+                        <span id="datepicker"><i class="fas fa-calendar"></i> {{ sampling|date('d M Y') }}</span>
+                    </th>
                 </tr>
                 <tr>
                     <th rowspan="2" class="text-center align-middle">Tampungan (Juta M3)</th>
@@ -39,19 +50,19 @@
                         <td>{{ loop.index }}</td>
                         <td><a href="{{ path_for('bendungan.tma', {'id': w.id}) }}">{{ w.nama }}</a></td>
                         <td> - </td>
-                        <td class="text-right">{{ w.volume|number_format(0, ',', '.') }}</td>
-                        <td class="text-right">{{ w.lbi|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.elev_puncak|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.muka_air_max|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.muka_air_min|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.tma6|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.tma12|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.tma18|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.outflow_vol|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.outflow_deb|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.spillway_deb|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.debit|number_format(2, ',', '.') }}</td>
-                        <td class="text-right">{{ w.curahhujan|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">{% if w.volume %}{{ w.volume|number_format(0, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.lbi %}{{ w.lbi|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.elev_puncak %}{{ w.elev_puncak|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.muka_air_max %}{{ w.muka_air_max|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.muka_air_min %}{{ w.muka_air_min|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.tma6 %}{{ w.tma6|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.tma12 %}{{ w.tma12|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.tma18 %}{{ w.tma18|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.outflow_vol %}{{ w.outflow_vol|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.outflow_deb %}{{ w.outflow_deb|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.spillway_deb %}{{ w.spillway_deb|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.debit %}{{ w.debit|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
+                        <td class="text-right">{% if w.curahhujan %}{{ w.curahhujan|number_format(2, ',', '.') }}{% else %}-{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -63,8 +74,17 @@
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/id.js') }}"></script>
     <script src="{{ asset('js/bootstrap-editable.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
     <script>
         $(document).ready(function() {
+          $('#datepicker').datepicker({
+            todayHighlight: true,
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+          });
+          $('#datepicker').on('changeDate', function () {
+            window.location = "{{ path_for('bendungan') }}?sampling=" + $('#datepicker').datepicker('getFormattedDate')
+          });
           $(function () {
             $('[data-toggle="tooltip"]').tooltip()
           });

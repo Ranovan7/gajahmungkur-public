@@ -11,7 +11,7 @@ $app->group('/map', function() {
         return $this->view->render($response, 'map/bendungan.html', [
              'key' => 'value'
         ]);
-    })->setName('bendungan');
+    })->setName('bendungan.map');
 
     $this->get('/embung', function(Request $request, Response $response, $args) {
 
