@@ -54,19 +54,29 @@ $app->group('/primabot', function() {
             }
         }
         // generating tma data
-        $tmalatest = $this->db->query("SELECT * FROM lokasi
+        $tmalatest = $this->db->query("SELECT device.*,
+                                            lokasi.nama as nama_lokasi,
+                                            periodik.wlev as wlev,
+                                            periodik.sampling as sampling
+                                        FROM device
                                         LEFT JOIN periodik ON periodik.id = (
                                             SELECT id from periodik
-                                                WHERE periodik.lokasi_id = lokasi.id
+                                                WHERE periodik.device_sn = device.sn
                                                     AND periodik.sampling <= '{$to}'
                                                 ORDER BY sampling DESC
                                                 LIMIT 1
                                         )
-                                        WHERE lokasi.jenis = '2'
-                                        ORDER BY lokasi.id")->fetchAll();
+                                        LEFT JOIN lokasi ON lokasi.id = (
+                                            SELECT id from periodik
+                                                WHERE lokasi.id = device.lokasi_id
+                                                LIMIT 1
+                                        )
+                                        WHERE device.tipe = 'awlr'
+                                        ORDER BY device.id")->fetchAll();
         foreach ($tmalatest as $tma) {
             $tma['wlev'] = max(round($tma['wlev'], 2), 0);
         }
+        // dump($tmalatest);
 
         return $this->view->render($response, 'primabot/index.html', [
             'hujan_sejak' => $sejak,
@@ -81,7 +91,7 @@ $app->group('/primabot', function() {
         $next_date = date('Y-m-d', strtotime($hari .' +1day'));
 
         $all_devices = [];
-        $devices = $this->db->query("SELECT * FROM device WHERE lokasi_id > 0 ORDER BY sn")->fetchAll();
+        $devices = $this->db->query("SELECT * FROM device ORDER BY sn")->fetchAll();
 
         foreach ($devices as $dev) {
             $res = $this->db->query("SELECT sampling
@@ -89,19 +99,19 @@ $app->group('/primabot', function() {
                                        WHERE device_sn='{$dev['sn']}' AND sampling::date='{$hari}'
                                        ORDER BY sampling")->fetchAll();
             $hourly = [];
+            for($i = 0; $i < 24; $i++) {
+                $hourly[$i] = 0;
+            }
             foreach ($res as $r) {
                 $hour = intval(date('H', strtotime($r['sampling'])));
-                if (array_key_exists($hour, $hourly)) {
-                    $hourly[$hour] += 1;
-                } else {
-                    $hourly[$hour] = 1;
-                }
-                $all_devices[] = [
-                    'device' => r,
-                    'hourly_count' => hourly
-                ];
+                $hourly[$hour] += 1;
             }
+            $all_devices[] = [
+                'device' => $dev,
+                'hourly_count' => $hourly
+            ];
         }
+        // dump($all_devices);
 
         return $this->view->render($response, 'primabot/sehat.html', [
             'sampling' => $hari,
