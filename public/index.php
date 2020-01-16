@@ -305,6 +305,7 @@ $app->group('/api', function() {
 
 require __DIR__ . '/../src/main.php';
 require __DIR__ . '/../src/map.php';
+require __DIR__ . '/../src/primabot.php';
 require __DIR__ . '/../src/bendungan.php';
 
 /**
