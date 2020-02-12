@@ -17,10 +17,9 @@ $app->group('/bendungan', function() {
                                                     waduk_id
                                                 FROM periodik_daily
                                                 WHERE sampling='{$sampling} 00:00:00'")->fetchAll();
-        $periodik_keamanan = $this->db->query("SELECT debit, waduk_id
-                                                FROM periodik_keamanan
-                                                WHERE sampling='{$sampling} 00:00:00'
-                                                    AND keamanan_type = 'vnotch'")->fetchAll();
+        $vnotch = $this->db->query("SELECT vn1_debit, waduk_id
+                                                FROM periodik_vnotch
+                                                WHERE sampling='{$sampling} 00:00:00'")->fetchAll();
         $tma = $this->db->query("SELECT manual, sampling, waduk_id
                                     FROM tma
                                     WHERE sampling BETWEEN '{$sampling} 00:00:00' AND '{$sampling} 23:55:00'")->fetchAll();
@@ -43,11 +42,11 @@ $app->group('/bendungan', function() {
             $waduk[$daily['waduk_id']]['curahhujan'] = $daily['curahhujan'];
             $waduk[$daily['waduk_id']]['outflow_vol'] = $daily['outflow_vol'];
         }
-        foreach($periodik_keamanan as $keamanan){
+        foreach($vnotch as $keamanan){
             if (array_key_exists("debit", $keamanan['waduk_id'])) {
-                $waduk[$keamanan['waduk_id']]['debit'] += $keamanan['debit'];
+                $waduk[$keamanan['waduk_id']]['debit'] += $keamanan['vn1_debit'];
             } else {
-                $waduk[$keamanan['waduk_id']]['debit'] = $keamanan['debit'];
+                $waduk[$keamanan['waduk_id']]['debit'] = $keamanan['vn1_debit'];
             }
         }
         foreach($tma as $t){
@@ -159,26 +158,18 @@ $app->group('/bendungan', function() {
             $start = date('Y-m-d', strtotime($end .' -1year'));
 
             $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
-            $periodik_vnotch = $this->db->query("SELECT periodik_keamanan.*,
-                                                periodik_daily.curahhujan as ch,
-                                                vnotch.nama as vn_name
-                                        FROM periodik_keamanan
+            $periodik_vnotch = $this->db->query("SELECT periodik_vnotch.*,
+                                                periodik_daily.curahhujan as ch
+                                        FROM periodik_vnotch
                                         LEFT JOIN periodik_daily ON periodik_daily.id = (
                                             SELECT id from periodik_daily
-                                                WHERE periodik_daily.sampling = periodik_keamanan.sampling
-                                                    AND periodik_daily.waduk_id = periodik_keamanan.waduk_id
+                                                WHERE periodik_daily.sampling = periodik_vnotch.sampling
+                                                    AND periodik_daily.waduk_id = periodik_vnotch.waduk_id
                                                 LIMIT 1
                                         )
-                                        LEFT JOIN vnotch ON vnotch.id = (
-                                            SELECT id from vnotch
-                                                WHERE vnotch.waduk_id = periodik_keamanan.waduk_id
-                                                LIMIT 1
-                                        )
-                                        WHERE periodik_keamanan.waduk_id={$id}
-                                            AND periodik_keamanan.keamanan_type='vnotch'
-                                            AND periodik_keamanan.debit > 0
-                                            AND periodik_keamanan.sampling BETWEEN '{$start}' AND '{$end}'
-                                        ORDER BY periodik_keamanan.sampling
+                                        WHERE periodik_vnotch.waduk_id={$id}
+                                            AND periodik_vnotch.sampling BETWEEN '{$start}' AND '{$end}'
+                                        ORDER BY periodik_vnotch.sampling
                                         LIMIT 24");
 
             $filtered_vnotch = [];
@@ -190,11 +181,10 @@ $app->group('/bendungan', function() {
                         'vn' => []
                     ];
                 }
-                if (!array_key_exists($vn['vn_name'], $filtered_vnotch[$tgl_str]['vn'])){
-                    $filtered_vnotch[$tgl_str]['vn'][$vn['vn_name']] = 0;
-                }
                 $filtered_vnotch[$tgl_str]['ch'] += $vn['ch'];
-                $filtered_vnotch[$tgl_str]['vn'][$vn['vn_name']] += $vn['debit'];
+                $filtered_vnotch[$tgl_str]['vn']['VNotch 1'] += $vn['vn1_debit'];
+                $filtered_vnotch[$tgl_str]['vn']['VNotch 2'] += $vn['vn2_debit'];
+                $filtered_vnotch[$tgl_str]['vn']['VNotch 3'] += $vn['vn3_debit'];
             }
 
             $vnotch = [
@@ -237,15 +227,10 @@ $app->group('/bendungan', function() {
             $start = date('Y-m-d', strtotime($end .' -1year'));
 
             $waduk = $this->db->query("SELECT * FROM waduk WHERE id={$id}")->fetch();
-            $piezometer = $this->db->query("SELECT * FROM piezometer WHERE waduk_id={$id}")->fetchAll();
-            $piezo_perio = $this->db->query("SELECT periodik_keamanan.*,
-                                                    piezometer.nama as nama_piezo
-                                                FROM periodik_keamanan
-                                                LEFT JOIN piezometer ON piezometer.id = periodik_keamanan.keamanan_id
-                                                WHERE periodik_keamanan.waduk_id={$id}
-                                                    AND periodik_keamanan.keamanan_type='piezometer'
+            $piezo_perio = $this->db->query("SELECT * FROM periodik_piezo
+                                                WHERE periodik_piezo.waduk_id={$id}
                                                     AND sampling BETWEEN '{$start}' AND '{$end}'
-                                                ORDER BY periodik_keamanan.sampling")->fetchAll();
+                                                ORDER BY periodik_piezo.sampling")->fetchAll();
 
             $tgl_perio = [];
             $piezodata = [];
